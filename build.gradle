@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
+}
+
+group 'org.codeland'
+version '0.1'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    implementation ("net.dv8tion:JDA:4.2.0_168") {
+        exclude module: 'opus-java'
+    }
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+
+shadowJar {
+    manifest {
+        attributes "Main-Class": "org.codeland.BotMainKt"
+    }
+
+    archiveFileName = "UHCBot.jar"
+}
+
+task copyProduction(type: Copy) {
+    from 'build/libs/UHCBot.jar'
+    into "production"
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "14"
+    }
+}

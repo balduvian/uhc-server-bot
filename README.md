@@ -1,0 +1,3 @@
+# UHC Server Bot
+
+Features and stuff coming soon...
