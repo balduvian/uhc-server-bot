@@ -17,16 +17,18 @@ object DataFile {
 
 			/* every ___.txt file is a RoleToggleData entry */
 			if (filename.endsWith(".txt")) {
-				val roleName = filename.substring(0, filename.length - 4)
+				val roleId = filename.substring(0, filename.length - 4)
 
 				/* get the color of the role from the .txt file */
+				/* get the display name of the role too */
 				val reader = BufferedReader(FileReader(file))
 				val color = reader.readLine().toInt(16)
+				val roleName = reader.readLine()
 				reader.close()
 
 				/* get the associated image from an image file with the same name */
 				val imagePath = files.find { file2 ->
-					file2.toPath().fileName.toString() == "$roleName.png"
+					file2.toPath().fileName.toString() == "$roleId.png"
 				}?.absolutePath ?: return null
 
 				DataReturn(roleName, imagePath, color)

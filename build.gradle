@@ -1,7 +1,7 @@
 plugins {
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.31'
+    id 'idea'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
 }
 
 group 'org.codeland'
@@ -9,15 +9,16 @@ version '0.1'
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 dependencies {
-    implementation ("net.dv8tion:JDA:4.2.0_168") {
+    implementation ("net.dv8tion:JDA:4.3.0_277") {
         exclude module: 'opus-java'
     }
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 
 shadowJar {
@@ -34,7 +35,10 @@ task copyProduction(type: Copy) {
 }
 
 compileKotlin {
+    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.javaParameters = true
     kotlinOptions {
-        jvmTarget = "14"
+        languageVersion = "1.5"
+        apiVersion = "1.5"
     }
 }

@@ -8,14 +8,12 @@ import java.io.FileReader
 import org.codeland.toggle.RoleToggle
 import java.awt.Color
 import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent
 import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.codeland.toggle.Toggle
-import java.lang.Exception
 
 class UHCServerBot(
 	val token: String,
@@ -24,7 +22,11 @@ class UHCServerBot(
 	val iconPath: String
 
 ) : ListenerAdapter() {
-	val jda = JDABuilder.createDefault(token).enableIntents(GatewayIntent.GUILD_MEMBERS).build()
+	val jda = JDABuilder.createDefault(token)
+		.enableIntents(GatewayIntent.GUILD_MEMBERS)
+		.enableIntents(GatewayIntent.GUILD_EMOJIS)
+		.enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS)
+		.build()
 	val selfID: Long = jda.selfUser.idLong
 
 	lateinit var toggleMessages: ArrayList<ToggleMessage>
@@ -50,21 +52,25 @@ class UHCServerBot(
 	}
 
 	private fun setupRoleToggle(guild: Guild, data: DataFile.DataReturn): RoleToggle {
-		val roleList = guild.getRolesByName(data.roleName, false)
-		val role = if (roleList.isEmpty()) {
-			guild.createRole().setColor(Color(data.color)).setName(data.roleName).complete()
-		} else {
-			roleList[0]
-		}
+		/* emotes cannot have special characters in their name, unlike roles */
+		val roleName = data.roleName
+		val emoteName = data.roleName.filter { it.lowercaseChar() in 'a'..'z' }
 
-		val emoteList = guild.getEmotesByName(data.roleName, false)
-		val emote = if (emoteList.isEmpty()) {
-			guild.createEmote(data.roleName, Icon.from(File(data.imagePath))).complete()
-		} else {
-			emoteList[0]
-		}
+		val existingRole = guild.getRolesByName(data.roleName, false)
+		val existingEmote = guild.getEmotesByName(emoteName, false)
 
-		return RoleToggle(role, emote)
+		return RoleToggle(
+			if (existingRole.isEmpty()) {
+				guild.createRole().setColor(Color(data.color)).setName(roleName).complete()
+			} else {
+				existingRole[0]
+			},
+			if (existingEmote.isEmpty()) {
+				guild.createEmote(emoteName, Icon.from(File(data.imagePath))).complete()
+			} else {
+				existingEmote[0]
+			}
+		)
 	}
 
 	fun setActivity(activityMessage: String) {
@@ -73,7 +79,9 @@ class UHCServerBot(
 
 	override fun onReady(event: ReadyEvent) {
 		/* set up the bot's appearance */
-		jda.selfUser.manager.setAvatar(Icon.from(File(iconPath))).complete()
+		try {
+			jda.selfUser.manager.setAvatar(Icon.from(File(iconPath))).complete()
+		} catch (ex: Exception) {}
 		setActivity("UHC Server")
 
 		/* setup the toggle messages */

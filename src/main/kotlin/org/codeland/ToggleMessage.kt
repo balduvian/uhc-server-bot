@@ -68,7 +68,7 @@ class ToggleMessage(
 
 		if (messageID == NO_DATA) return getMessage(null)
 
-		channel.retrieveMessageById(messageID).queue(getMessage)
+		channel.retrieveMessageById(messageID).queue(getMessage) { getMessage(null) }
 	}
 
 	/**
