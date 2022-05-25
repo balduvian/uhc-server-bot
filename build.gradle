@@ -24,7 +24,7 @@ dependencies {
 
 shadowJar {
     manifest {
-        attributes "Main-Class": "org.codeland.BotMainKt"
+        attributes "Main-Class": "org.gaseumlabs.uhcserverbot.BotMainKt"
     }
 
     archiveFileName = "UHCBot.jar"
@@ -49,7 +49,7 @@ compileKotlin {
 }
 
 application {
-    mainClassName("org.codeland.BotMainKt")
+    mainClassName("org.gaseumlabs.uhcserverbot.BotMainKt")
 }
 
 run {

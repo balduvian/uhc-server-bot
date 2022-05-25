@@ -100,8 +100,8 @@ class UHCServerBot(val config: BotConfig) : ListenerAdapter() {
 	}
 
 	override fun onGuildMemberJoin(event: GuildMemberJoinEvent) {
-		val memberRoles = event.guild.getRolesByName("member", true)
-		if (memberRoles.isEmpty()) return println("Member role does not exist")
+		val memberRoles = event.guild.getRolesByName("uhc", true)
+		if (memberRoles.isEmpty()) return println("uhc role does not exist")
 
 		event.guild.addRoleToMember(event.member, memberRoles[0]).queue()
 	}
