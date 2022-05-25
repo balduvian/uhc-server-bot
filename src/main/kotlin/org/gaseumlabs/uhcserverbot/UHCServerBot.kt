@@ -1,28 +1,20 @@
-package org.codeland
+package org.gaseumlabs.uhcserverbot
 
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.*
 import java.io.File
-import java.io.BufferedReader
-import java.io.FileReader
-import org.codeland.toggle.RoleToggle
+import org.gaseumlabs.uhcserverbot.toggle.RoleToggle
 import java.awt.Color
 import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent
-import net.dv8tion.jda.api.events.message.guild.GuildMessageDeleteEvent
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
-import org.codeland.toggle.Toggle
+import org.gaseumlabs.uhcserverbot.toggle.Toggle
 
-class UHCServerBot(
-	val token: String,
-	val guildID: String,
-	val channelID: String,
-	val iconPath: String
-
-) : ListenerAdapter() {
-	val jda = JDABuilder.createDefault(token)
+class UHCServerBot(val config: BotConfig) : ListenerAdapter() {
+	val jda = JDABuilder.createDefault(config.token)
 		.enableIntents(GatewayIntent.GUILD_MEMBERS)
 		.enableIntents(GatewayIntent.GUILD_EMOJIS)
 		.enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS)
@@ -33,22 +25,6 @@ class UHCServerBot(
 
 	init {
 		jda.addEventListener(this)
-	}
-
-	companion object {
-		fun createUHCServerBot(dataFilename: String): UHCServerBot {
-			val file = File(dataFilename)
-			val reader = BufferedReader(FileReader(file))
-
-			val token = reader.readLine()
-			val guildID = reader.readLine()
-			val channelID = reader.readLine()
-			val iconPath = reader.readLine()
-
-			reader.close()
-
-			return UHCServerBot(token, guildID, channelID, iconPath)
-		}
 	}
 
 	private fun setupRoleToggle(guild: Guild, data: DataFile.DataReturn): RoleToggle {
@@ -78,15 +54,13 @@ class UHCServerBot(
 	}
 
 	override fun onReady(event: ReadyEvent) {
-		/* set up the bot's appearance */
-		try {
-			jda.selfUser.manager.setAvatar(Icon.from(File(iconPath))).complete()
-		} catch (ex: Exception) {}
 		setActivity("UHC Server")
 
 		/* setup the toggle messages */
-		val guild = jda.getGuildById(guildID) ?: throw Exception("No guild by ID $guildID")
-		val toggleChannel = guild.getTextChannelById(channelID) ?: throw Exception("No channel by ID $channelID")
+		val guild = jda.getGuildById(config.guildId)
+			?: throw Exception("No guild by ID ${config.guildId}")
+		val toggleChannel = guild.getTextChannelById(config.toggleChannelId)
+			?: throw Exception("No channel by ID ${config.toggleChannelId}")
 
 		ToggleMessage.setupDir()
 
@@ -108,18 +82,19 @@ class UHCServerBot(
 		}
 	}
 
-	override fun onGuildMessageReactionAdd(event: GuildMessageReactionAddEvent) {
+	override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
 		val currentMessage = findToggleMessage(event.messageIdLong) ?: return
-		val user = event.user
+		val user = event.user ?: return
+		val member = event.member ?: return
 		/* don't do anything when bot is adding initial reactions */
 		if (user.idLong == selfID) return
 
 		/* reset the reaction for this user */
-		event.reaction.removeReaction(event.user).queue()
-		if (!user.isBot) currentMessage.doToggle(event.reactionEmote.emote, event.guild, event.member)
+		event.reaction.removeReaction(user).queue()
+		if (!user.isBot) currentMessage.doToggle(event.reactionEmote.emote, event.guild, member)
 	}
 
-	override fun onGuildMessageDelete(event: GuildMessageDeleteEvent) {
+	override fun onMessageDelete(event: MessageDeleteEvent) {
 		/* regenerate the message if it was deleted */
 		findToggleMessage(event.messageIdLong)?.generateMessage()
 	}

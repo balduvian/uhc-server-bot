@@ -1,4 +1,4 @@
-package org.codeland.toggle
+package org.gaseumlabs.uhcserverbot.toggle
 
 import net.dv8tion.jda.api.entities.Emote
 import net.dv8tion.jda.api.entities.Guild

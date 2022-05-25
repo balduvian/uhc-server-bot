@@ -1,4 +1,4 @@
-package org.codeland
+package org.gaseumlabs.uhcserverbot
 
 import java.io.File
 import java.io.BufferedReader

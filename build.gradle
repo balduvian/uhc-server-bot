@@ -1,7 +1,8 @@
 plugins {
     id 'idea'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
+    id 'application'
 }
 
 group 'org.codeland'
@@ -16,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation ("net.dv8tion:JDA:4.3.0_277") {
+    implementation("net.dv8tion:JDA:5.0.0-alpha.12") {
         exclude module: 'opus-java'
     }
 }
@@ -31,14 +32,28 @@ shadowJar {
 
 task copyProduction(type: Copy) {
     from 'build/libs/UHCBot.jar'
-    into "production"
+    into 'production'
+}
+
+task copyDevelopment(type: Copy) {
+    from 'build/libs/UHCBot.jar'
+    into 'development'
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "16"
-    kotlinOptions.javaParameters = true
+    kotlinOptions.jvmTarget = "17"
     kotlinOptions {
-        languageVersion = "1.5"
-        apiVersion = "1.5"
+        languageVersion = "1.6"
+        apiVersion = "1.6"
     }
 }
+
+application {
+    mainClassName("org.codeland.BotMainKt")
+}
+
+run {
+    workingDir("./development")
+}
+
+build.dependsOn(shadowJar)

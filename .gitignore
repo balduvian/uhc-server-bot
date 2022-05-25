@@ -2,5 +2,6 @@
 /.idea
 /build
 /gradle
-/production
+/production/*
+/development/*
 *.log

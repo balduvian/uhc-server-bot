@@ -1,7 +1,7 @@
-package org.codeland
+package org.gaseumlabs.uhcserverbot
 
 import net.dv8tion.jda.api.entities.*
-import org.codeland.toggle.Toggle
+import org.gaseumlabs.uhcserverbot.toggle.Toggle
 import java.io.File
 import java.io.BufferedReader
 import java.io.FileReader
