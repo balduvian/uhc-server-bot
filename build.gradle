@@ -20,6 +20,9 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-alpha.12") {
         exclude module: 'opus-java'
     }
+    implementation("io.ktor:ktor-server-core:2.0.2")
+    implementation("io.ktor:ktor-server-netty:2.0.2")
+    implementation("com.google.code.gson:gson:2.9.0")
 }
 
 shadowJar {

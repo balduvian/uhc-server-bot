@@ -6,6 +6,7 @@ class BotConfig(
 	val token: String,
 	var guildId: String,
 	var toggleChannelId: String,
+	var publicKey: String,
 ) {
 	companion object {
 		const val BOT_FILE_NAME = "./bot.properties"
@@ -14,6 +15,7 @@ class BotConfig(
 			"token",
 			"guildId",
 			"toggleChannelId",
+			"publicKey",
 		)
 
 		fun fromFile(filename: String): BotConfig? {
@@ -43,6 +45,7 @@ class BotConfig(
 				propertyValues[0]!!,
 				propertyValues[1]!!,
 				propertyValues[2]!!,
+				propertyValues[3]!!,
 			)
 		}
 	}
